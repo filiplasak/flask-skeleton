@@ -1,0 +1,4 @@
+**/*.pyc
+app/app.db
+env
+.idea
