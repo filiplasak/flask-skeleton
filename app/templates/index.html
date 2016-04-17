@@ -2,4 +2,7 @@
 {% block body %}
 <p>Index page</p>
 <a href="/login">Login</a>
+{% if current_user.is_authenticated %}
+<p>Current user: {{ current_user.email }}</p>
+{% endif %}
 {% endblock %}

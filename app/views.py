@@ -1,23 +1,38 @@
-from app import app, login_manager
 from flask import render_template, request, redirect, url_for
-from flask_login import login_user
+from flask_login import login_user, current_user, logout_user, login_required
+
+from app import app, login_manager, bcrypt
 from models import User
+
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', current_user=current_user)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        if request.form['username'] == 'admin':
-            login_user(User('admin', 'admin@mail'))
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email).first()
+        if user and bcrypt.check_password_hash(bcrypt.generate_password_hash(user.password), password):
+            login_user(User.query.filter_by(email='admin').first())
             return redirect(url_for('index'))
+        else:
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+
 @app.route('/invoices')
+@login_required
 def invoices():
     return 'invoices !'
 

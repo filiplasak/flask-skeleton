@@ -13,7 +13,7 @@ class User(db.Model):
     def __repr__(self):
         return "email: %s, password: %s" % (self.email, self.password)
 
-    def is_authenticated(selfself):
+    def is_authenticated(self):
         return True
 
     def is_active(self):
@@ -23,4 +23,4 @@ class User(db.Model):
         return False
 
     def get_id(self):
-        return self.id
+        return unicode(self.id)
