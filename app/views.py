@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for
 from flask_login import login_user, current_user, logout_user, login_required
 
-from app import app, login_manager, bcrypt
+from app import app, login_manager, bcrypt, db
 from models import User
 
 
@@ -16,8 +16,8 @@ def login():
         email = request.form['email']
         password = request.form['password']
         user = User.query.filter_by(email=email).first()
-        if user and bcrypt.check_password_hash(bcrypt.generate_password_hash(user.password), password):
-            login_user(User.query.filter_by(email='admin').first())
+        if user and bcrypt.check_password_hash(user.password, password):
+            login_user(User.query.filter_by(email=email).first())
             return redirect(url_for('index'))
         else:
             return redirect(url_for('login'))
@@ -29,6 +29,18 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User(email, password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('register.html')
 
 
 @app.route('/invoices')
